@@ -36,7 +36,7 @@ fi
 
 ./prep_sampleSheet.sh $index > $sampleSheet
 bcl2fastq -R $indir -o $fastq --sample-sheet $sampleSheet --no-lane-splitting --barcode-mismatches $idx_mis 
-./stat_demultiplex.sh $fastq/Stats/DemultiplexingStats.xml > $fastq/demultiplex_stat.txt
+./demultiplex_stats.sh $fastq/Stats/DemultiplexingStats.xml > $fastq/demultiplex_stat.txt
 mkdir $outdir/fastqc
 for i in $fastq/fastq/*001.fastq.gz; do fastqc -t -o $outdir/fastqc $i; done
 mkdir $outdir/mapping
