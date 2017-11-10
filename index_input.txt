@@ -1,10 +1,10 @@
-#Sample_Name	5'index_id	5'index	3'index_id	3'index	project
-Sample1	FW01	ATTGGC	RT07	GATCTG	fastq
-Sample2	FW02	TACAAG	RT09	TTGACT	fastq
-Sample3	FW03	CACTGT	RT10	GGAACT	fastq
-Sample4	FW04	TTTCAC	RT11	TGACAT	fastq
-Sample5	FW05	ACATCG	RT12	GCGGAC	fastq
-Sample6	FW06	TGGTCA	RT13	CGTGAT	fastq
+#Name	5'_id	5'index	3'_id	3'index	project
+Sample1	FW01	ATTGGC	RT07	GATCTG	TIFseq2
+Sample2	FW02	TACAAG	RT09	TTGACT	TIFseq2
+Sample3	FW03	CACTGT	RT10	GGAACT	TIFseq2
+Sample4	FW04	TTTCAC	RT11	TGACAT	TIFseq2
+Sample5	FW05	ACATCG	RT12	GCGGAC	TIFseq2
+Sample6	FW06	TGGTCA	RT13	CGTGAT	TIFseq2
 #Investigator:Vicent Pelechano
 #Date:
 #Experiment:
