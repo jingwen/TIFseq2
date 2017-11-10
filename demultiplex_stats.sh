@@ -6,12 +6,13 @@ BEGIN { FS="[<>]" }
 }
 /Sample name/{
 	split($2,n,"\"");
-	if(n[2]=="all") printf ("%s\t\t\t\t\t",n[2]);
+	if(n[2]=="all") printf ("%s\t\t\t\t\t",n[2])
 	else printf("%s\t",n[2])
 }
 /Barcode name/{
 	split($2,n,"\"");
 	printf("%s\t",n[2])
+	if(n[2]=="all") count=0
 }
 /Lane number/{
 	getline;
