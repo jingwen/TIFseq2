@@ -9,7 +9,7 @@
 END{
 c=length(s)
 index5[c+2]="GGGGGG";index3[c+2]="GGGGGG";id5[c+2]="unknown";id3[c+2]="unknown";s[c+2]="empty";
-printf("[Header]\nInvestigator Name,%s\nExperiment Name,%s\nDate,%s\nWorkflow,GenerateFASTQ\nApplication,NextSeq FASTQ Only\n\n[Reads]\n%i\n%i\n\n[Setting]\n",PR,PJ,DT,RL1,RL2)
+printf("[Header]\nInvestigator Name,%s\nExperiment Name,%s\nDate,%s\nWorkflow,GenerateFASTQ\nApplication,NextSeq FASTQ Only\n\n[Reads]\n%i\n%i\n\n[Setting]\nMaskAdapter,AGGTGACCGGCAGGTGT\nMaskAdapterRead2,AGGTGACCGGCAGGTGT\n",PR,PJ,DT,RL1,RL2)
 printf("\n[Data]\nSample_ID,Sample_Name,I7_Index_ID,index,I5_Index_ID,index2,Sample_project\n")
 for (i=2;i<=c+2;i++){
 	for (j=2;j<=c+2;j++){
