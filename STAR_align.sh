@@ -1,16 +1,16 @@
 #!/bin/bash
 
-echo "start loading modules"
 module load bioinfo-tools
 module load star
 
-while getopts "hR:I:O:p:j:m:" opt; do
+while getopts "hR:A:I:O:p:j:m:" opt; do
         case $opt in
 	h)
-		echo "Usage: STAR_align.sh -R <reference genome dir> -I <input fastq dir> -O <output fastq dir> -p <thread number>"
+		echo "Usage: STAR_align.sh -R <reference genome dir> -A <annotation gtf> -I <input fastq dir> -O <output fastq dir> -p <thread number> -j <max intron> -m <max mate distance>"
                 exit 0
                 ;;
         R)genomedir=$OPTARG;;
+	A)annotation=$OPTARG;;
 	I)indir=$OPTARG;;
         O)outdir=$OPTARG;;
         p)thread=$OPTARG;;
@@ -43,10 +43,17 @@ indir=${indir%/}
 outdir=${outdir%/}
 for cut5 in $indir/*5cut*.fastq.gz; do
 	cut3=${cut5/_5cut/_3cut}
+	echo "5'end file: $cut5"
+	echo "3'end file: $cut3"
 	file=${cut5##*/}
 	IFS=_
 	name=($file)
+	echo "${name[0]}"
 	unset IFS
-	echo "star --runThreadN $thread --runMode alignReads --genomeDir $genomedir --readFilesIn $cut5 $cut3 --alignIntronMax $intron --alignMatesGapMax $mate --readFilesCommand zcat --outSAMtype BAM SortedByCoordinate --outFileNamePrefix $outdir/${name[0]}."
-	star --runThreadN $thread --runMode alignReads --genomeDir $genomedir --readFilesIn $cut5 $cut3 --alignIntronMax $intron --alignMatesGapMax $mate --readFilesCommand zcat --outSAMtype BAM SortedByCoordinate --outFileNamePrefix $outdir/${name[0]}.
+	star --runThreadN $thread --runMode alignReads --genomeDir $genomedir --sjdbGTFfile $annotation --readFilesIn $cut5 $cut3 --alignIntronMax $intron --alignMatesGapMax $mate --alignEndsType Extend5pOfReads12 --readFilesCommand zcat --outSAMtype BAM SortedByCoordinate --outFileNamePrefix $outdir/${name[0]}.
+	star --runThreadN $thread --runMode alignReads --genomeDir $genomedir --sjdbGTFfile $annotation --readFilesIn $cut5 --alignIntronMax $intron --alignEndsType Extend5pOfRead1 --readFilesCommand zcat --outSAMtype BAM SortedByCoordinate --outFileNamePrefix $outdir/${name[0]}_5end.
+	star --runThreadN $thread --runMode alignReads --genomeDir $genomedir --sjdbGTFfile $annotation --readFilesIn $cut3 --alignIntronMax $intron --alignEndsType Extend5pOfRead1 --readFilesCommand zcat --outSAMtype BAM SortedByCoordinate --outFileNamePrefix $outdir/${name[0]}_3end.
+	samtools index $outdir/${name[0]}.Aligned.sortedByCoord.out.bam
+	umi_tools dedup -I $outdir/${name[0]}.*bam -S $outdir/${name[0]}.UMI.bam --method cluster -L $outdir/${name[0]}.UMI.log --paired --spliced-is-unique --output-stats $outdir/${name[0]}.UMI.stats
+	samtools index $outdir/${name[0]}.UMI.bam 
 done
