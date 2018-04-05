@@ -36,6 +36,17 @@ class Read(object):
         else:
             reads[chro]={strand:[read]}
     
+    def test(self,r1,r2):
+        if r1.flag<256:
+            r1.flag=r1.flag+64
+        else:
+            r1.flag=r1.flag+64-256
+        if r2.flag<256:
+            r2.flag=r2.flag+128
+        else:
+            r2.flag=r2.flag+128-256
+        self.pair_count+=1
+    
     def classify(self):
         intersect=[value for value in self.end5_reads if value in self.end3_reads]
         if len(intersect)==1:
@@ -48,15 +59,7 @@ class Read(object):
                 for r1 in read5:
                     for r2 in read3:
                         if r1.reference_start <= r2.reference_start:
-                            if r1.flag<256:
-                                r1.flag=r1.flag+64
-                            else:
-                                r1.flag=r1.flag+64-256
-                            if r2.flag<256:
-                                r2.flag=r2.flag+128
-                            else:
-                                r2.flag=r2.flag+128-256
-                            self.pair_count+=1
+                            self.test(r1,r2)
                             self.pairs.append([r1,r2])
             if True in chro_end5 and False in chro_end3:
                 read5=chro_end5[True]
@@ -64,15 +67,7 @@ class Read(object):
                 for r1 in read5:
                     for r2 in read3:
                         if r1.reference_start >= r2.reference_start:
-                            if r1.flag<256:
-                                r1.flag=r1.flag+64
-                            else:
-                                r1.flag=r1.flag+64-256
-                            if r2.flag<256:
-                                r2.flag=r2.flag+128
-                            else:
-                                r2.flag=r2.flag+128-256
-                            self.pair_count+=1
+                            self.test(r1,r2)
                             self.pairs.append([r2,r1])
     
     def print_readpairs(self,unique_file,multi_file):
@@ -83,9 +78,14 @@ class Read(object):
             for read_pairs in self.pairs:
                 multi_file.write(read_pairs[0])
                 multi_file.write(read_pairs[1])
+    
+def hamming_distance(s1, s2):
+    assert len(s1) == len(s2)
+    return sum(ch1 != ch2 for ch1, ch2 in zip(s1, s2))
 
+unique_file_name=argv[2]
 input_file=pysam.AlignmentFile(argv[1],"rb")
-unique_file=pysam.AlignmentFile(argv[2],"wb",template=input_file)
+unique_file=pysam.AlignmentFile(unique_file_name,"wb",template=input_file)
 multi_file=pysam.AlignmentFile(argv[3],"wb",template=input_file)
 current_read=Read(None)
 for read in input_file.fetch(until_eof=True):
@@ -106,8 +106,8 @@ unique_file.close()
 multi_file.close()
 input_file.close()
 
-fix_mate=argv[2].replace("_unique","_fixmate")
+fix_mate=unique_file_name.replace("_unique","_fixmate")
 sort_bam=fix_mate.replace("_fixmate","_sorted")
-pysam.fixmate(argv[2],fix_mate)
+pysam.fixmate(unique_file_name,fix_mate)
 pysam.sort("-o",sort_bam,fix_mate)
 pysam.index(sort_bam)
