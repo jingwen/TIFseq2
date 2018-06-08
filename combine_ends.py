@@ -1,40 +1,39 @@
 from sys import argv
 import pysam
+import collections
 
 hits_tag = "NH"
 all_read=0
 
 class Read(object):
+    #initiate a Read class to store reads with same ID
     def __init__(self, name):
         self.name = name
         self.end5_count = 0
         self.end3_count = 0
-        self.end5_reads = dict()
-        self.end3_reads = dict()
+        self.end5_reads = collections.defaultdict(dict)
+        self.end3_reads = collections.defaultdict(dict)
         self.chro=None
         self.pair_count=0
         self.pairs=[]
-        
+    #record reads at 5'ends    
     def input_5end(self, read):
         self.end5_count = read.get_tag(hits_tag)
         strand=read.is_reverse
         chro=read.reference_name
         self.fill_dict(chro,strand,self.end5_reads,read)
-    
+    #record reads at 3'ends
     def input_3end(self, read):
         self.end3_count = read.get_tag(hits_tag)
         strand=read.is_reverse
         chro=read.reference_name
         self.fill_dict(chro,strand,self.end3_reads,read)
-    
+    #update reads dict
     def fill_dict(self,chro,strand,reads,read):
-        if chro in reads:
-            try:
-                reads[chro][strand].append(read)
-            except KeyError:
-                reads[chro][strand]=[read]
-        else:
-            reads[chro]={strand:[read]}
+        try:
+            reads[chro][strand].append(read)
+        except KeyError:
+            reads[chro][strand]=[read]
     
     def test(self,r1,r2):
         if r1.flag<256:
@@ -59,16 +58,18 @@ class Read(object):
                 for r1 in read5:
                     for r2 in read3:
                         if r1.reference_start <= r2.reference_start:
-                            self.test(r1,r2)
-                            self.pairs.append([r1,r2])
+                            if r1.reference_end<=r2.reference_end:
+				self.test(r1,r2)
+                            	self.pairs.append([r1,r2])
             if True in chro_end5 and False in chro_end3:
                 read5=chro_end5[True]
                 read3=chro_end3[False]
                 for r1 in read5:
                     for r2 in read3:
                         if r1.reference_start >= r2.reference_start:
-                            self.test(r1,r2)
-                            self.pairs.append([r2,r1])
+                            if r1.reference_end>=r2.reference_end:
+				self.test(r1,r2)
+                            	self.pairs.append([r2,r1])
     
     def print_readpairs(self,unique_file,multi_file):
         if self.pair_count==1:
@@ -89,25 +90,27 @@ unique_file=pysam.AlignmentFile(unique_file_name,"wb",template=input_file)
 multi_file=pysam.AlignmentFile(argv[3],"wb",template=input_file)
 current_read=Read(None)
 for read in input_file.fetch(until_eof=True):
-    name = read.qname
-    if name!=current_read.name:
-        try: 
-            current_read.classify() 
-        except KeyError: 
-            pass
-        if current_read.pair_count>0:
-            current_read.print_readpairs(unique_file,multi_file)
-        current_read=Read(name)
-    if "5end" in read.get_tag("RG"):
-        current_read.input_5end(read)
-    elif "3end" in read.get_tag("RG"):
-        current_read.input_3end(read)
+    umi=read.qname.split("_")[-1]
+    if hamming_distance("GGGGGGGG",umi)>1:
+	name = read.qname
+    	if name!=current_read.name:
+    	    try: 
+    	        current_read.classify() 
+    	    except KeyError: 
+    	        pass
+    	    if current_read.pair_count>0:
+    	        current_read.print_readpairs(unique_file,multi_file)
+    	    current_read=Read(name)
+    	if "5end" in read.get_tag("RG"):
+    	    current_read.input_5end(read)
+    	elif "3end" in read.get_tag("RG"):
+    	    current_read.input_3end(read)
 unique_file.close()
 multi_file.close()
 input_file.close()
 
-fix_mate=unique_file_name.replace("_unique","_fixmate")
-sort_bam=fix_mate.replace("_fixmate","_sorted")
+fix_mate=unique_file_name.replace("_unique","_fixuniq")
+sort_bam=fix_mate.replace("_fixuniq","_uniq_sorted")
 pysam.fixmate(unique_file_name,fix_mate)
 pysam.sort("-o",sort_bam,fix_mate)
 pysam.index(sort_bam)
