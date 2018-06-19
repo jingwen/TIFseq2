@@ -35,7 +35,7 @@ if [ ! -d "$bothdir" ];then mkdir $bothdir; fi
 if [ ! -d "$UMIdir" ];then mkdir $UMIdir; fi
 if [ ! -d "$cutdir" ];then mkdir $cutdir; fi
 if [ ! -d "$polyAdir" ];then mkdir $polyAdir; fi
-if [[ $polyA < 101010101010101010100 ]];then error_rate=0.1; else error_rate=0.05; fi
+if [[ $polyA < 100 ]];then error_rate=0.1; else error_rate=0.05; fi
 for fq1 in $indir/*5_S*R1_001.fastq.gz; do
 	fq2=${fq1/R1_001/R2_001}
 	if [ ! -f $fq2 ];then
@@ -58,12 +58,12 @@ for fq1 in $indir/*5_S*R1_001.fastq.gz; do
 			echo "Processing "${sample[0]}
 			cat $fq2 $indir/"${sample[0]}"_5_"${sample[2]}"_3_S*_R1_001.fastq.gz > $out5
 			cat $fq1 $indir/"${sample[0]}"_5_"${sample[2]}"_3_S*_R2_001.fastq.gz > $out3
-			cutadapt -a "AGGTGACCGGC" -A "AGGTGACCGGC" --match-read-wildcards --minimum-length 28 -o $cut5 -p $cut3 $out5 $out3 > $cutdir/${sample[0]}_cutAdapter.log
+			cutadapt -a "AGGTGACCGG" -A "AGGTGACCGG" -a "AGATCGGAAG" -A "AGATCGGAAG" --nextseq-trim=20 --match-read-wildcards --minimum-length 28 -o $cut5 -p $cut3 $out5 $out3 > $cutdir/${sample[0]}_cutAdapter.log
 			echo "Extracting UMIs"
 			umi_tools extract -I $cut5 --extract-method=string --bc-pattern=NNNNNNNN --read2-in=$cut3 --stdout=$umi5 --read2-out=$umi3 --log=$UMIdir/${sample[0]}_UMI.log
 #			fastqc -o $UMIdir $umi5 $umi3
 			echo -e "Finish extracting UMIs\nCutting adapters..."
-			cutadapt -a "A{$[polyA-8]}" -G "T{$polyA}" -O 1 --error-rate $error_rate --match-read-wildcards --minimum-length 20 -o $polyA5 -p $polyA3 $umi5 $umi3 > $polyAdir/${sample[0]}_cutPolyA.log
+			cutadapt -a "A{$[polyA-8]}" -G "T{$polyA}" --nextseq-trim=20 -O 1 --error-rate $error_rate --match-read-wildcards --minimum-length 20 -o $polyA5 -p $polyA3 $umi5 $umi3 > $polyAdir/${sample[0]}_cutPolyA.log
 			echo "Finish cutting adapters"
 		fi
 	fi
