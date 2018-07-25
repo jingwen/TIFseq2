@@ -56,6 +56,9 @@ for cut5 in $indir/*5cut*.fastq.gz; do
 	star --runThreadN $thread --runMode alignReads --genomeDir $genomedir --sjdbGTFfile $annotation --readFilesIn $cut3 --alignIntronMax $intron --alignEndsType Extend5pOfRead1 --scoreInsOpen -1 --scoreDelOpen -1 --readFilesCommand zcat --outSAMtype BAM Unsorted --outSAMattributes NH HI NM AS --outSAMattrRGline ID:${name[0]}_3end --outFileNamePrefix $outdir/${name[0]}_3end.
 	samtools sort -n -o $outdir/${name[0]}_3end.name.bam $outdir/${name[0]}_3end.Aligned.out.bam
 	samtools merge -f -n $outdir/${name[0]}.name.bam $outdir/${name[0]}_5end.name.bam $outdir/${name[0]}_3end.name.bam
+	rm $outdir/${name[0]}_*end.name.bam
 	python ~/TIFseq2/combine_ends.py $outdir/${name[0]}.name.bam $outdir/${name[0]}_unique.bam $outdir/${name[0]}_multi.bam
-	umi_tools dedup -I $outdir/${name[0]}*_sorted.bam -S $outdir/${name[0]}_unique_UMI.bam --method cluster -L $outdir/${name[0]}_unique_UMI.log --paired --output-stats $outdir/${name[0]}_unique_UMI.stats
+	rm $outdir/${name[0]}*unique.bam
+#	umi_tools dedup -I $outdir/${name[0]}*_sorted.bam -S $outdir/${name[0]}_unique_UMI.bam --method cluster -L $outdir/${name[0]}_unique_UMI.log --paired --output-stats $outdir/${name[0]}_unique_UMI.stats
+	python ~/TIFseq2/dedup.py -I $outdir/${name[0]}*_sorted.bam -S $outdir/${name[0]}_unique_UMI.bam --method=cluster -L $outdir/${name[0]}_unique_UMI.log --paired
 done

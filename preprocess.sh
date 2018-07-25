@@ -1,16 +1,17 @@
 #!/bin/bash
-
+module load bioinfo-tools
 module load FastQC
 module load cutadapt
 
-while getopts "hI:O:A:" opt; do
+while getopts "hI:O:j:A:" opt; do
 	case $opt in
 	h)
-		echo "Usage: preprocess.sh -I <input fastq dir> -O <output fastq dir> -A <polyA size>"
+		echo "Usage: preprocess.sh -I <input fastq dir> -O <output fastq dir> -j 4 -A <polyA size>"
 		exit 0
 		;;
 	I)indir=$OPTARG;;
 	O)outdir=$OPTARG;;
+	j)thread=$OPTARG;;
 	A)polyA=$OPTARG;;
 	esac
 done
@@ -58,13 +59,14 @@ for fq1 in $indir/*5_S*R1_001.fastq.gz; do
 			echo "Processing "${sample[0]}
 			cat $fq2 $indir/"${sample[0]}"_5_"${sample[2]}"_3_S*_R1_001.fastq.gz > $out5
 			cat $fq1 $indir/"${sample[0]}"_5_"${sample[2]}"_3_S*_R2_001.fastq.gz > $out3
-			cutadapt -a "AGGTGACCGG" -A "AGGTGACCGG" -a "AGATCGGAAG" -A "AGATCGGAAG" --nextseq-trim=20 --match-read-wildcards --minimum-length 28 -o $cut5 -p $cut3 $out5 $out3 > $cutdir/${sample[0]}_cutAdapter.log
-			echo "Extracting UMIs"
+			echo "Cuting adapters..."
+			cutadapt -j $thread -a "AGGTGACCGG" -A "AGGTGACCGG" -a "AGATCGGAAG" -A "AGATCGGAAG" --nextseq-trim=20 --match-read-wildcards --minimum-length 28 -o $cut5 -p $cut3 $out5 $out3 > $cutdir/${sample[0]}_cutAdapter.log
+			echo -e "Finish cutting adapters. Now extracting UMIs..."
 			umi_tools extract -I $cut5 --extract-method=string --bc-pattern=NNNNNNNN --read2-in=$cut3 --stdout=$umi5 --read2-out=$umi3 --log=$UMIdir/${sample[0]}_UMI.log
 #			fastqc -o $UMIdir $umi5 $umi3
-			echo -e "Finish extracting UMIs\nCutting adapters..."
-			cutadapt -a "A{$[polyA-8]}" -G "T{$polyA}" --nextseq-trim=20 -O 1 --error-rate $error_rate --match-read-wildcards --minimum-length 20 -o $polyA5 -p $polyA3 $umi5 $umi3 > $polyAdir/${sample[0]}_cutPolyA.log
-			echo "Finish cutting adapters"
+			echo -e "Finish extracting UMIs. Now cutting As stretch..."
+			cutadapt -j $thread -a "A{$[polyA-8]}" -G "T{$polyA}" --nextseq-trim=20 -O 1 --error-rate $error_rate --match-read-wildcards --minimum-length 20 -o $polyA5 -p $polyA3 $umi5 $umi3 > $polyAdir/${sample[0]}_cutPolyA.log
+			echo "Finish processing "${sample[0]}
 		fi
 	fi
 done
