@@ -84,10 +84,11 @@ def hamming_distance(s1, s2):
     assert len(s1) == len(s2)
     return sum(ch1 != ch2 for ch1, ch2 in zip(s1, s2))
 
-unique_file_name=argv[2]
+unique_file_name=argv[1].replace(".name","_unique")
+multi_file_name=argv[1].replace(".name","_multi")
 input_file=pysam.AlignmentFile(argv[1],"rb")
 unique_file=pysam.AlignmentFile(unique_file_name,"wb",template=input_file)
-multi_file=pysam.AlignmentFile(argv[3],"wb",template=input_file)
+multi_file=pysam.AlignmentFile(multi_file_name,"wb",template=input_file)
 current_read=Read(None)
 for read in input_file.fetch(until_eof=True):
     umi=read.qname.split("_")[-1]
