@@ -8,9 +8,9 @@ import pysam
 import collections
 
 input_file=pysam.AlignmentFile(argv[1],"rb")
-end5_file=argv[1].replace("UMI.bam","5end.ctss")
-end3_file=argv[1].replace("UMI.bam","3end.ctss")
-boundary_file=argv[1].replace("UMI.bam","boundary.txt")
+end5_file=argv[1].replace(".bam","_5end.ctss")
+end3_file=argv[1].replace(".bam","_3end.ctss")
+boundary_file=argv[1].replace(".bam","_boundary.txt")
 end5=open(end5_file,"w")
 end3=open(end3_file,"w")
 border=open(boundary_file,"w")
