@@ -15,10 +15,6 @@ printf("\n[Data]\nSample_ID,Sample_Name,I7_Index_ID,index,I5_Index_ID,index2,Pro
 for (i=2;i<c+2;i++){
 	printf("%s_5_%s_3,%s_5_%s_3,%s,%s,%s,%s,%s\n",s[i],s[i],s[i],s[i],id3[i],index3[i],id5[i],index5[i],proj[i])
 	printf("%s_3_%s_5,%s_3_%s_5,%s,%s,%s,%s,%s\n",s[i],s[i],s[i],s[i],id5[i],index5[i],id3[i],index3[i],proj[i])
-	printf("%s_5_empty_3,%s_5_empty_3,empty,%s,%s,%s,%s\n",s[i],s[i],index3[c+2],id5[i],index5[i],proj[i])
-	printf("empty_5_%s_3,empty_5_%s_3,%s,%s,empty,%s,%s\n",s[i],s[i],id3[i],index3[i],index5[c+2],proj[i])
-	printf("%s_3_empty_5,%s_3_empty_5,empty,%s,%s,%s,%s\n",s[i],s[i],index5[c+2],id3[i],index3[i],proj[i])
-	printf("empty_3_%s_5,empty_3_%s_5,%s,%s,empty,%s,%s\n",s[i],s[i],id5[i],index5[i],index3[c+2],proj[i])
 	}
 }
 
