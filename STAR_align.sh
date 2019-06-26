@@ -3,7 +3,7 @@
 module load bioinfo-tools
 module load star
 
-while getopts "hR:A:I:O:p:j:m:" opt; do
+while getopts "hR:AI:O:p:j:m:" opt; do
         case $opt in
 	h)
 		echo "Usage: STAR_align.sh -R <reference genome dir> -A <annotation gtf> -I <input fastq dir> -O <output fastq dir> -p <thread number> -j <max intron> -m <max mate distance>"

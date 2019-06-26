@@ -801,52 +801,6 @@ class get_bundles:
                             self.compare_umis(p,k,p_near,k)
 
 
-    def shift_umi(self, shift_bp):
-        for p in sorted(self.reads_dict.keys()):
-            p_near=p+shift_bp
-            for k in self.reads_dict[p].keys():
-                umi=self.reads_dict[p][k].keys()
-                rev_strand=k[0][0]
-                insert_size=k[0][2]
-                if self.options.paired:
-                    k_near=((rev_strand,k[0][1],insert_size-shift_bp,k[0][3]),None)
-                else:
-                    k_near=k
-#                print p,k,k_near
-                if k_near in self.reads_dict[p].keys():
-                    umi_near=self.reads_dict[p][k_near].keys()
-                    umi_overlap = set(umi).intersection(set(umi_near))
-                    if len(umi_overlap)>0:
-                        for u in umi_overlap:
-                            near_count=self.reads_dict[p][k_near][u]["count"]
-                            p_count=self.reads_dict[p][k][u]["count"]
-                            near_read=self.reads_dict[p][k_near][u]["read"]
-                            p_read=self.reads_dict[p][k][u]["read"]
-                            if near_count >= p_count and near_read.get_tag("NM") <= p_read.get_tag("NM"):
-                                self.reads_dict[p][k_near][u]["count"]+=p_count
-                                del self.reads_dict[p][k][u]
-                            else:
-                                self.reads_dict[p][k][u]["count"]+=near_count
-                                del self.reads_dict[p][k_near][u]
-                elif p_near in self.reads_dict.keys():
-                    if k_near in self.reads_dict[p_near].keys():
-                        umi_near=self.reads_dict[p_near][k_near].keys()
-                        umi_overlap = set(umi).intersection(set(umi_near))
-                        if len(umi_overlap)>0:
-                            for u in umi_overlap:
-                                near_count=self.reads_dict[p_near][k_near][u]["count"]
-                                p_count=self.reads_dict[p][k][u]["count"]
-                                near_read=self.reads_dict[p_near][k_near][u]["read"]
-                                p_read=self.reads_dict[p][k][u]["read"]
-                                if near_count >= p_count and near_read.get_tag("NM") <= p_read.get_tag("NM"):
-                                    self.reads_dict[p_near][k_near][u]["count"]+=p_count
-                                    del self.reads_dict[p][k][u]
-                                else:
-                                    self.reads_dict[p][k][u]["count"]+=near_count
-                                    del self.reads_dict[p_near][k_near][u]
-                    else:break
-                
-        
     def __call__(self, inreads):
 
         for read in inreads:
