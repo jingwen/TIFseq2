@@ -1,7 +1,5 @@
 '''
-Created on 27 Mar 2018
-
-@author: jingwenwang
+Modified based on UMI-tools source codes
 '''
 import os
 import sys
