@@ -26,4 +26,20 @@ cluster<-function(input_dir,a,r1,r2,n,dis,suffix){
 K562_end5_dist10=cluster(args[1],a=1.49,r1=1,r2=10000,n=4.2*10^6)
 K562_end3_dist10=cluster(args[2],a=1.17,r1=1,r2=10000,n=3.8*10^6)
 K562_3Tfill_dist10=cluster(args[3],a=1.05,r1=1,r2=100000,n=2.5*10^6,dis=10,suffix="_3end.ctss")
-save(K562_end5_dist10,K562_end3_dist10,K562_3Tfill_dist10,file="cluster.rda")
+
+## determined the peak of each consensus cluster
+dominant <- function(cluster_end){
+  tagNorm=CTSSnormalizedTpm(cluster_end)
+  tag=CTSScoordinatesGR(cluster_end)
+  tag$score=rowSums(tagNorm[,4:length(tagNorm)])
+  tag <- tag[tag$cluster != ""]
+  tag_frame=as.data.frame(tag)
+  tag_list=split(tag_frame,tag_frame$cluster)
+  peak=lapply(tag_list,function(x) x[which.max(x$score),]$pos)
+  return(peak)
+}
+
+peak_5end_dist10=unlist(dominant(K562_end5_dist10))
+peak_3end_dist10=unlist(dominant(K562_end3_dist10))
+
+save(K562_3Tfill_dist10,K562_end5_dist10,K562_end3_dist10,peak_5end_dist10,peak_3end_dist10,file="cluster.rda")
