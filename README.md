@@ -13,5 +13,7 @@ STAR_align.sh -R <STAR_index_dir> -A <splicing_junction_gtf> -I <output_dir>/cut
 python boundary.py <input_bam>
 ### Filter internal priming of 3'end
 Rscript clean_As.R <3end_ctss_path>
-### Cluster TIF boundaries
+### Cluster 5' ends and 3' ends respectively
 Rscript cluster_end.R <TIF_5end_path> <TIF_3end_path> <3'T-fill_3end_path>
+### Construct transcription isoform (TIF) boundaries
+Rscript form_TIF.R
