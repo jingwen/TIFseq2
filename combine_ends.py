@@ -59,8 +59,8 @@ class Read(object):
                     for r2 in read3:
                         if r1.reference_start <= r2.reference_start:
                             if r1.reference_end<=r2.reference_end:
-				self.test(r1,r2)
-                            	self.pairs.append([r1,r2])
+                                self.test(r1,r2)
+                                self.pairs.append([r1,r2])
             if True in chro_end5 and False in chro_end3:
                 read5=chro_end5[True]
                 read3=chro_end3[False]
@@ -68,8 +68,8 @@ class Read(object):
                     for r2 in read3:
                         if r1.reference_start >= r2.reference_start:
                             if r1.reference_end>=r2.reference_end:
-				self.test(r1,r2)
-                            	self.pairs.append([r2,r1])
+                                self.test(r1,r2)
+                                self.pairs.append([r2,r1])
     
     def print_readpairs(self,unique_file,multi_file):
         if self.pair_count==1:
@@ -93,8 +93,8 @@ current_read=Read(None)
 for read in input_file.fetch(until_eof=True):
     umi=read.qname.split("_")[-1]
     if hamming_distance("GGGGGGGG",umi)>1:
-	name = read.qname
-    	if name!=current_read.name:
+        name = read.qname
+        if name!=current_read.name:
     	    try: 
     	        current_read.classify() 
     	    except KeyError: 
@@ -102,9 +102,9 @@ for read in input_file.fetch(until_eof=True):
     	    if current_read.pair_count>0:
     	        current_read.print_readpairs(unique_file,multi_file)
     	    current_read=Read(name)
-    	if "5end" in read.get_tag("RG"):
+        if "5end" in read.get_tag("RG"):
     	    current_read.input_5end(read)
-    	elif "3end" in read.get_tag("RG"):
+        elif "3end" in read.get_tag("RG"):
     	    current_read.input_3end(read)
 unique_file.close()
 multi_file.close()
