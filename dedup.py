@@ -1,5 +1,6 @@
 '''
 Modified based on UMI-tools source codes
+Compatible in python 2.7
 '''
 import os
 import sys
@@ -781,9 +782,7 @@ class get_bundles:
             #umi_collector=lambda: collections.defaultdict(dict)
             p_near=p+shift_bp
             p_keys=self.reads_dict[p].keys()
-            p_keys.sort(key=lambda x:x[0][2])
-            #print p_keys
-            for k in p_keys:
+            for k in sorted(p_keys,key=lambda x:x[0][2]):
                 if self.options.paired == False:
                     if p_near in self.reads_dict.keys():
                         self.compare_umis(p,k,p_near,k)
