@@ -1,9 +1,9 @@
 #!/bin/bash
 
 module load bioinfo-tools
-module load star
+module load star/2.5.3a
 
-while getopts "hR:AI:O:p:j:m:" opt; do
+while getopts "hR:A:I:O:p:j:m:" opt; do
         case $opt in
 	h)
 		echo "Usage: STAR_align.sh -R <reference genome dir> -A <annotation gtf> -I <input fastq dir> -O <output fastq dir> -p <thread number> -j <max intron> -m <max mate distance>"
@@ -24,6 +24,7 @@ if [ -z "$intron" ]; then intron=0; fi
 if [ -z "$mate" ]; then mate=0; fi
 
 echo "Referenece: $genomedir"
+echo "Annotation file: $annotation"
 echo "Input directory: $indir"
 echo "Output directory: $outdir"
 echo "#thread for alignment: $thread"
@@ -41,6 +42,9 @@ fi
 
 indir=${indir%/}
 outdir=${outdir%/}
+
+pyenv local anaconda2-2018.12
+
 for cut5 in $indir/*5cut*.fastq.gz; do
 	cut3=${cut5/_5cut/_3cut}
 	echo "5'end file: $cut5"
@@ -59,5 +63,5 @@ for cut5 in $indir/*5cut*.fastq.gz; do
 	rm $outdir/${name[0]}_*end.name.bam
 	python ~/TIFseq2/combine_ends.py $outdir/${name[0]}.name.bam
 #	umi_tools dedup -I $outdir/${name[0]}*_sorted.bam -S $outdir/${name[0]}_unique_UMI.bam --method cluster -L $outdir/${name[0]}_unique_UMI.log --paired --output-stats $outdir/${name[0]}_unique_UMI.stats
-#	python ~/TIFseq2/dedup.py -I $outdir/${name[0]}*_sorted.bam -S $outdir/${name[0]}_unique_UMI.bam --method=cluster -L $outdir/${name[0]}_unique_UMI.log --paired --spliced-is-unique
+	python ~/TIFseq2/dedup.py -I $outdir/${name[0]}*_sorted.bam -S $outdir/${name[0]}_unique_UMI.bam --method=cluster -L $outdir/${name[0]}_unique_UMI.log --paired --spliced-is-unique
 done
