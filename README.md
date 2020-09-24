@@ -1,5 +1,7 @@
 # TIF-Seq2
 
+The analysis pipeline and downstream analysis in jingwen/TIFseq2 are used for publication [TIF-Seq2 disentangles overlapping isoforms in complex human transcriptomes](https://doi.org/10.1093/nar/gkaa691). The scripts for TIF-Seq2 data pre-processing and alignment in other TIF-Seq2 related publication are in [PelechanoLab/TIFseq2](https://github.com/PelechanoLab/TIFseq2).
+
 ### Prepare sample sheet for demultiplexing
 prep_sampleSheet.awk <index_info> > <sample_sheet>
 ### Demultiplex
