@@ -43,8 +43,6 @@ fi
 indir=${indir%/}
 outdir=${outdir%/}
 
-pyenv local anaconda2-2018.12
-
 for cut5 in $indir/*5cut*.fastq.gz; do
 	cut3=${cut5/_5cut/_3cut}
 	echo "5'end file: $cut5"
