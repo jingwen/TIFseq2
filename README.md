@@ -3,7 +3,7 @@
 The analysis pipeline and downstream analysis in jingwen/TIFseq2 are used for publication [TIF-Seq2 disentangles overlapping isoforms in complex human transcriptomes](https://doi.org/10.1093/nar/gkaa691). The scripts for TIF-Seq2 data pre-processing and alignment in other TIF-Seq2 related publication are in [PelechanoLab/TIFseq2](https://github.com/PelechanoLab/TIFseq2).
 
 ### Prepare sample sheet for demultiplexing
-prep_sampleSheet.awk <index_info> > <sample_sheet>
+prep_sampleSheet.awk <index_input.txt> > <sample_sheet>
 ### Demultiplex
 bcl2fastq -R <input_dir> -o <fastq_dir> --sample-sheet <sample_sheet> --no-lane-splitting --barcode-mismatches <mismatch>
 demultiplex_stats.awk <fastq_dir>/Stats/DemultiplexingStats.xml > <fastq_dir>/demultiplex_stat.txt
